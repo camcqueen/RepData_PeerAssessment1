@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ##Introduction
 The purpose of this assignment is to answer multiple questions about a set of activity monitoring data and draw conclusions based on those results. 
@@ -22,8 +17,29 @@ Note: These functions were written on a Mac and may have difficulties when read 
 
 
 ## Loading and preprocessing the data  
-```{r loadNprocess, echo=TRUE}  
+
+```r
 library(dplyr)
+```
+
+```
+## Warning: package 'dplyr' was built under R version 3.1.2
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 
 #Read the file into R memory
@@ -38,7 +54,8 @@ act_data <- cbind(Activitydata[,c(1,3)],date)
 ## What is mean total number of steps taken per day?  
 Create a histogram of the total number of steps per day ignoring NAs.
 
-```{r histogram, echo=TRUE}
+
+```r
 #omit NAs from dataset
 act_data2 <- na.omit(act_data)
 
@@ -49,16 +66,28 @@ act_data_sum <- aggregate(steps ~ date, act_data2, sum)
 hist(act_data_sum$steps, main="Total steps per day", xlab="Total steps in a day")
 ```
 
+![](./PA1_template_files/figure-html/histogram-1.png) 
 
-```{r meannoNA, echo=TRUE}
+
+
+```r
 #Calculate the average number of steps per day ignoring NAs.
 mean(act_data_sum$steps)
 ```
 
-```{r mediannoNA, echo=TRUE}
+```
+## [1] 10766.19
+```
+
+
+```r
 #Calculate the median number of steps per day.
 median(act_data_sum$steps)
-``` 
+```
+
+```
+## [1] 10765
+```
 **The average total steps per day is 10766.**  
 **The median total steps per day is 10765.**
 
@@ -66,27 +95,37 @@ median(act_data_sum$steps)
 
 Time series plot which shows the average steps by interval across all days.
 
-```{r stepsbyinterval, echo=TRUE}
+
+```r
 #aggregate the average steps by 5 minute interval
 act_data_interval <- aggregate(steps ~ interval, act_data2, mean)
 
 #create a line plot of the average number of steps by interval across all days.
 with(act_data_interval, plot(interval, steps,, type = "l", main="Average steps by interval across all days", xlab = "Interval", ylab = "Steps"))
-```    
+```
 
-```{r max, echo=TRUE}  
+![](./PA1_template_files/figure-html/stepsbyinterval-1.png) 
+
+
+```r
 #find max row and pull out that id.
 row_id <- which.max(act_data_interval$steps)
 
 #read max row to determine interval with max steps.
 act_data_interval[row_id, ]
-```  
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
+```
   
 **Interval 835 with 206 steps is the 5-minute interval with the maximum average steps.**
 
 
 ## Imputing missing values  
-```{r missingvalues, echo=TRUE}
+
+```r
 #create dataset with only NAs.
 act_data_NA <- act_data[!complete.cases(act_data),]
 
@@ -94,10 +133,15 @@ act_data_NA <- act_data[!complete.cases(act_data),]
 nrow(act_data_NA)  
 ```
 
+```
+## [1] 2304
+```
+
 **There are a total of 2304 missing values in the data set.**  
 **Imputation method: Replace NAs with the average steps for the respective 5 minute interval.**
 
-```{r impute, echo=TRUE}  
+
+```r
 #replace NAs with average steps for the respective 5 minute interval.
 for (i in 1:nrow(act_data)){  
   if (is.na (act_data$steps[i] )) {  
@@ -115,17 +159,29 @@ act_data_imputation <- aggregate(steps ~ date, act_data, sum)
 hist(act_data_imputation$steps, main="Total steps per day with imputation for NAs", xlab="Total steps in a day")
 ```
 
+![](./PA1_template_files/figure-html/impute-1.png) 
 
-```{r meanimp, echo=TRUE}
+
+
+```r
 #Calculate the average number of steps per day.  
 mean(act_data_imputation$steps)
 ```
 
+```
+## [1] 10766.19
+```
+
  
-```{r medianimp, echo=TRUE}
+
+```r
 #Calculate the median number of steps per day. 
 median(act_data_imputation$steps)
-```  
+```
+
+```
+## [1] 10766.19
+```
 **When comparting the average total steps with imputation (10766) to the average total steps ignoring missing values (10766), we see there is no change between the two .**  
   
 **When comparting the median of the total steps with imputation (10766) to the median of the total steps ignoring missing values (10765), we see there is a relatively small change between the two .**  
@@ -133,8 +189,8 @@ median(act_data_imputation$steps)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r dayofweek, echo=TRUE}
 
+```r
 #add a column indicating day of the week.
 act_data$day <- weekdays(act_data$date)
 
@@ -158,3 +214,5 @@ new_interval_imputation <- aggregate(steps ~ interval+day_type, act_data, mean)
 qplot(interval, steps, data=new_interval_imputation, geom=c("line"), xlab="Interval", 
       ylab="Steps", main="") + facet_wrap(~ day_type, ncol=1)
 ```
+
+![](./PA1_template_files/figure-html/dayofweek-1.png) 
